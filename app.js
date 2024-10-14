@@ -33,10 +33,16 @@ const Gameboard = () => {
 };
 
 const Players = () => {
-  const player1 = "X";
-  const player2 = "O";
 
-  const s = (player, marker) => {};
+  const createPlayer = (name, marker) => {
+    return { name, marker };
+  };
+
+  const makeMove = (board, row, col, value) => {
+    return board.setCell(row, col, value);
+  }
+
+  return { createPlayer, makeMove };
 };
 
 const GameController = () => {};
