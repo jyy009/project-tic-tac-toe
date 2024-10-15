@@ -16,7 +16,7 @@ const Gameboard = () => {
     }
   };
 
-  const getBoard = () => board;
+  const getBoard = () => console.log(board);
 
   const setCell = (row, col, value) => {
     if (row >= 0 && row < rows && col >= 0 && col < columns) {
@@ -27,22 +27,35 @@ const Gameboard = () => {
     }
   };
 
+  const resetBoard = () => initializeBoard();
+
   initializeBoard();
 
-  return { initializeBoard, getBoard, setCell };
+  return { initializeBoard, getBoard, setCell, resetBoard };
 };
 
-const Players = () => {
 
+const Player = () => {
   const createPlayer = (name, marker) => {
     return { name, marker };
   };
 
   const makeMove = (board, row, col, value) => {
     return board.setCell(row, col, value);
-  }
+  };
 
   return { createPlayer, makeMove };
 };
 
-const GameController = () => {};
+
+const GameController = () => {
+  const board = Gameboard()
+  const players = Player()
+
+  const playRound = (player, row, col) => {
+    players.makeMove(board, row, col, player.marker);
+    board.getBoard();
+  };
+
+  return { playRound };
+};
