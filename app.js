@@ -1,7 +1,3 @@
-/*
-You’re going to store the gameboard as an array inside of a Gameboard object, so start there! Your players are also going to be stored in objects, and you’re probably going to want an object to control the flow of the game itself. 
-*/
-
 const Gameboard = () => {
   const rows = 3;
   const columns = 3;
@@ -20,8 +16,7 @@ const Gameboard = () => {
 
   const setCell = (row, col, value) => {
     if (row >= 0 && row < rows && col >= 0 && col < columns) {
-      board[row][col] = value;
-      return true;
+      return (board[row][col] = value);
     } else {
       return false;
     }
@@ -29,33 +24,55 @@ const Gameboard = () => {
 
   const resetBoard = () => initializeBoard();
 
+  const isCellMarked = (row, col) => {
+    if (board[row][col] !== "") {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const checkWinner = () => {
+    const winningCombo = [
+  [board[0][0], board[0][1], board[0][2]],
+  [board[1][0], board[1][1], board[1][2]],
+  [board[2][0], board[2][1], board[2][2]],
+  [board[0][0], board[1][0], board[2][0]],
+  [board[0][1], board[1][1], board[2][1]],
+  [board[0][2], board[1][2], board[2][2]],
+  [board[0][0], board[1][1], board[2][2]],
+  [board[0][2], board[1][1], board[2][0]],
+  ]
+
   initializeBoard();
 
-  return { initializeBoard, getBoard, setCell, resetBoard };
+  return { initializeBoard, getBoard, setCell, resetBoard, isCellMarked };
 };
 
-
 const Player = () => {
+  const board = Gameboard();
+
   const createPlayer = (name, marker) => {
     return { name, marker };
   };
 
-  const makeMove = (board, row, col, value) => {
-    return board.setCell(row, col, value);
-  };
-
-  return { createPlayer, makeMove };
+  return { createPlayer };
 };
 
-
 const GameController = () => {
-  const board = Gameboard()
-  const players = Player()
+  const board = Gameboard();
 
-  const playRound = (player, row, col) => {
-    players.makeMove(board, row, col, player.marker);
-    board.getBoard();
+
+  const playRound = (row, col, player) => {
+    if (board.isCellMarked(row, col)) {
+      alert("Invalid choice: Cell is already marked");
+    } else {
+      board.setCell(row, col, player.marker);
+      board.getBoard();
+    }
   };
+
+  
 
   return { playRound };
 };
