@@ -12,11 +12,15 @@ const Gameboard = () => {
     }
   };
 
-  const getBoard = () => console.log(board);
+  const getBoard = () => {
+    const result = [...board];
+    return console.log(result);
+  };
 
   const setCell = (row, col, value) => {
     if (row >= 0 && row < rows && col >= 0 && col < columns) {
-      return (board[row][col] = value);
+      board[row][col] = value;
+      return board;
     } else {
       return false;
     }
@@ -32,47 +36,113 @@ const Gameboard = () => {
     }
   };
 
-  const checkWinner = () => {
+  const checkWinner = (mark) => {
     const winningCombo = [
-  [board[0][0], board[0][1], board[0][2]],
-  [board[1][0], board[1][1], board[1][2]],
-  [board[2][0], board[2][1], board[2][2]],
-  [board[0][0], board[1][0], board[2][0]],
-  [board[0][1], board[1][1], board[2][1]],
-  [board[0][2], board[1][2], board[2][2]],
-  [board[0][0], board[1][1], board[2][2]],
-  [board[0][2], board[1][1], board[2][0]],
-  ]
+      [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ],
+      [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      [
+        [0, 2],
+        [1, 2],
+        [2, 2],
+      ],
+      [
+        [0, 0],
+        [1, 1],
+        [2, 2],
+      ],
+      [
+        [0, 2],
+        [1, 1],
+        [2, 0],
+      ],
+    ];
 
+    return winningCombo.some((combo) =>
+      combo.every(([row, col]) => board[row][col] === mark)
+    );
+  };
+
+  const checkTie = () => {};
   initializeBoard();
 
-  return { initializeBoard, getBoard, setCell, resetBoard, isCellMarked };
+  return {
+    initializeBoard,
+    getBoard,
+    setCell,
+    resetBoard,
+    isCellMarked,
+    checkWinner,
+  };
 };
 
+//Player factory funtion
 const Player = () => {
-  const board = Gameboard();
+  let currentPlayer = "X";
 
   const createPlayer = (name, marker) => {
     return { name, marker };
   };
 
-  return { createPlayer };
+  const switchPlayer = () => {
+    const resultingPlayer = currentPlayer === "X" ? "O" : "X";
+    return console.log("next player's marker:", resultingPlayer);
+  };
+
+  return { createPlayer, switchPlayer };
 };
 
-const GameController = () => {
-  const board = Gameboard();
-
-
+const GameController = (board, play) => {
   const playRound = (row, col, player) => {
-    if (board.isCellMarked(row, col)) {
-      alert("Invalid choice: Cell is already marked");
-    } else {
-      board.setCell(row, col, player.marker);
+    if (board.setCell(row, col, player.marker)) {
       board.getBoard();
+
+      let currentPlayer = player.marker;
+      return console.log("current player:", currentPlayer);
+    } else {
+      return "invalid move";
     }
   };
 
-  
+  const playGame = (row, col, player) => {
+    const roundResult = playRound(row, col, player);
 
-  return { playRound };
+    if (typeof roundResult === "string") {
+      return roundResult;
+    }
+    play.switchPlayer();
+    console.log("next player");
+
+    if (board.checkWinner(player.marker)) {
+      return console.log(`${player.marker} wins`);
+    }
+  };
+
+  return { playRound, playGame };
 };
+
+const gameboard = Gameboard();
+const player = Player();
+const control = GameController(gameboard, player);
