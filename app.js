@@ -85,7 +85,14 @@ const Gameboard = () => {
     );
   };
 
-  const checkTie = () => {};
+  const checkTie = (row, col) => {
+    const result = board.every(row => row.every(cell => cell !== ""))
+    if (result) {
+      console.log("it's a tie")
+    }
+    return result
+  };
+
   initializeBoard();
 
   return {
@@ -95,20 +102,23 @@ const Gameboard = () => {
     resetBoard,
     isCellMarked,
     checkWinner,
+    checkTie,
   };
 };
 
 //Player factory funtion
 const Player = () => {
-  let currentPlayer = "X";
-
-  const createPlayer = (name, marker) => {
-    return { name, marker };
+  
+  const createPlayer = (marker) => {
+    return { marker };
   };
+  
+  let currentPlayer = "X";
+  console.log("current player", currentPlayer)
 
-  const switchPlayer = () => {
-    const resultingPlayer = currentPlayer === "X" ? "O" : "X";
-    return console.log("next player's marker:", resultingPlayer);
+  const switchPlayer = (player) => {
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+  console.log("next player", currentPlayer);
   };
 
   return { createPlayer, switchPlayer };
@@ -119,8 +129,8 @@ const GameController = (board, play) => {
     if (board.setCell(row, col, player.marker)) {
       board.getBoard();
 
-      let currentPlayer = player.marker;
-      return console.log("current player:", currentPlayer);
+      // let currentPlayer = player.marker;
+      // return console.log("current player:", currentPlayer);
     } else {
       return "invalid move";
     }
@@ -132,12 +142,14 @@ const GameController = (board, play) => {
     if (typeof roundResult === "string") {
       return roundResult;
     }
-    play.switchPlayer();
+    play.switchPlayer(player);
     console.log("next player");
 
     if (board.checkWinner(player.marker)) {
       return console.log(`${player.marker} wins`);
     }
+
+    board.checkTie(row, col)
   };
 
   return { playRound, playGame };
