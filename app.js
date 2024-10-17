@@ -1,3 +1,4 @@
+// Gameboard IIFE
 const Gameboard = (function () {
   const rows = 3;
   const columns = 3;
@@ -7,14 +8,14 @@ const Gameboard = (function () {
     for (let i = 0; i < rows; i++) {
       board[i] = [];
       for (let j = 0; j < columns; j++) {
-        board[i][j] = "";
+        board[i][j] = "x";
       }
     }
   };
 
   const getBoard = () => {
     const result = [...board];
-    return console.log(result);
+    return result;
   };
 
   const setCell = (row, col, value) => {
@@ -28,13 +29,13 @@ const Gameboard = (function () {
 
   const resetBoard = () => initializeBoard();
 
-  const isCellMarked = (row, col) => {
-    if (board[row][col] !== "") {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  // const isCellMarked = (row, col) => {
+  //   if (board[row][col] !== "") {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
 
   const checkWinner = (mark) => {
     const winningCombo = [
@@ -100,13 +101,12 @@ const Gameboard = (function () {
     getBoard,
     setCell,
     resetBoard,
-    isCellMarked,
     checkWinner,
     checkTie,
   };
 })();
 
-//Player factory funtion
+//Player IIFE
 const Player = (function () {
   let currentPlayer = "X";
 
@@ -125,7 +125,6 @@ const Player = (function () {
 })();
 
 //Game flow factory funtion
-
 const GameController = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
@@ -159,4 +158,37 @@ const GameController = () => {
   return { playRound, playGame, gameboard, playerManager };
 };
 
+/*
+ create an object that will handle the display/DOM logic. Write a function that will render the contents of the gameboard array to the webpage (for now, you can always just fill the gameboard array with "X"s and "O"s just to see what’s going on).
+ */
+
+const DisplayLogic = () => {
+  const gameboard = Gameboard;
+
+  const gameContainer = document.querySelector(".game-container");
+
+  const displayBoard = () => {
+    gameContainer.innerHTML = "";
+    const board = gameboard.getBoard();
+
+    board.forEach((row, rowIndex) => {
+      const rowContainer = document.createElement("div");
+      gameContainer.appendChild(rowContainer);
+      rowContainer.textContent = row;
+    });
+  };
+  /*
+for (let i = 0; i < rows; i++) {
+      board[i] = [];
+      for (let j = 0; j < columns; j++) {
+        board[i][j] = "x";
+      }
+    }
+    */
+  displayBoard();
+
+  return { displayBoard, gameboard };
+};
+
 const control = GameController();
+const displayLogic = DisplayLogic();
