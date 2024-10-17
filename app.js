@@ -1,4 +1,4 @@
-const Gameboard = () => {
+const Gameboard = (function () {
   const rows = 3;
   const columns = 3;
   let board = [];
@@ -86,11 +86,11 @@ const Gameboard = () => {
   };
 
   const checkTie = (row, col) => {
-    const result = board.every(row => row.every(cell => cell !== ""))
+    const result = board.every((row) => row.every((cell) => cell !== ""));
     if (result) {
-      console.log("it's a tie")
+      console.log("it's a tie");
     }
-    return result
+    return result;
   };
 
   initializeBoard();
@@ -104,33 +104,35 @@ const Gameboard = () => {
     checkWinner,
     checkTie,
   };
-};
+})();
 
 //Player factory funtion
-const Player = () => {
-  
+const Player = (function () {
+  let currentPlayer = "X";
+
   const createPlayer = (marker) => {
     return { marker };
   };
-  
-  let currentPlayer = "X";
-  console.log("current player", currentPlayer)
 
-  const switchPlayer = (player) => {
+  console.log("current player", currentPlayer);
+
+  const switchPlayer = () => {
     currentPlayer = currentPlayer === "X" ? "O" : "X";
-  console.log("next player", currentPlayer);
+    console.log("next player", currentPlayer);
   };
 
   return { createPlayer, switchPlayer };
-};
+})();
 
-const GameController = (board, play) => {
+//Game flow factory funtion
+
+const GameController = () => {
+  const gameboard = Gameboard;
+  const playerManager = Player;
+
   const playRound = (row, col, player) => {
-    if (board.setCell(row, col, player.marker)) {
-      board.getBoard();
-
-      // let currentPlayer = player.marker;
-      // return console.log("current player:", currentPlayer);
+    if (gameboard.setCell(row, col, player.marker)) {
+      gameboard.getBoard();
     } else {
       return "invalid move";
     }
@@ -142,19 +144,19 @@ const GameController = (board, play) => {
     if (typeof roundResult === "string") {
       return roundResult;
     }
-    play.switchPlayer(player);
-    console.log("next player");
 
-    if (board.checkWinner(player.marker)) {
-      return console.log(`${player.marker} wins`);
+    if (!gameboard.checkWinner(player.marker)) {
+      playerManager.switchPlayer(player);
+      console.log("next player");
+    } else {
+      console.log(`${player.marker} wins`);
+      return gameboard.resetBoard();
     }
 
-    board.checkTie(row, col)
+    gameboard.checkTie(row, col);
   };
 
-  return { playRound, playGame };
+  return { playRound, playGame, gameboard, playerManager };
 };
 
-const gameboard = Gameboard();
-const player = Player();
-const control = GameController(gameboard, player);
+const control = GameController();
