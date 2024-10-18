@@ -8,14 +8,14 @@ const Gameboard = (function () {
     for (let i = 0; i < rows; i++) {
       board[i] = [];
       for (let j = 0; j < columns; j++) {
-        board[i][j] = "x";
+        board[i][j] = "";
       }
     }
   };
 
   const getBoard = () => {
-    const result = [...board];
-    return result;
+    // console.log([...board]);
+    return [...board]
   };
 
   const setCell = (row, col, value) => {
@@ -28,14 +28,6 @@ const Gameboard = (function () {
   };
 
   const resetBoard = () => initializeBoard();
-
-  // const isCellMarked = (row, col) => {
-  //   if (board[row][col] !== "") {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // };
 
   const checkWinner = (mark) => {
     const winningCombo = [
@@ -114,7 +106,7 @@ const Player = (function () {
     return { marker };
   };
 
-  const getCurrentPlayer = () => currentPlayer;
+  const getCurrentPlayer = () =>  currentPlayer;
 
   const setCurrentPlayer = (player) => {
     currentPlayer = player;
@@ -134,27 +126,27 @@ const GameController = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
 
-  const playRound = (row, col, player) => {
-    if (gameboard.setCell(row, col, player.marker)) {
-      gameboard.getBoard();
+  const playRound = (row, col, marker) => {
+    if (gameboard.setCell(row, col, marker)) {
+      playerManager.setCurrentPlayer(marker);
+      playerManager.getCurrentPlayer();
     } else {
       return "invalid move";
     }
   };
 
-  const playGame = (row, col, player) => {
-    const roundResult = playRound(row, col, player);
+  const playGame = (row, col, marker) => {
+    const roundResult = playRound(row, col, marker);
 
     if (typeof roundResult === "string") {
       return roundResult;
     }
 
-    if (!gameboard.checkWinner(player.marker)) {
-      playerManager.switchPlayer(player);
-      console.log("next player");
+    if (!gameboard.checkWinner(marker)) {
+      playerManager.switchPlayer();
     } else {
-      console.log(`${player.marker} wins`);
-      return gameboard.resetBoard();
+      console.log(`${marker} wins`);
+      // gameboard.resetBoard();
     }
 
     gameboard.checkTie(row, col);
@@ -168,11 +160,14 @@ const DisplayLogic = () => {
   const playerManager = Player;
 
   const gameContainer = document.querySelector(".game-container");
-  // const cellContainer = gameContainer.querySelectorAll(".cell-container")
 
   const displayBoard = () => {
     gameContainer.innerHTML = "";
     const board = gameboard.getBoard();
+
+    const cellWrapper = document.createElement("div");
+    cellWrapper.classList.add("cell-wrapper");
+    gameContainer.appendChild(cellWrapper);
 
     board.forEach((row, rowIndex) => {
       row.forEach((cell, colIndex) => {
@@ -181,7 +176,7 @@ const DisplayLogic = () => {
         cellContainer.textContent = cell;
         cellContainer.dataset.row = rowIndex;
         cellContainer.dataset.col = colIndex;
-        gameContainer.appendChild(cellContainer);
+        cellWrapper.appendChild(cellContainer);
 
         cellContainer.addEventListener("click", (e) => {
           handleCellClick(e);
@@ -190,54 +185,72 @@ const DisplayLogic = () => {
     });
   };
 
+  const playButton = () => {
+    const playButton = document.createElement("button");
+    playButton.classList.add("play-button");
+    playButton.textContent = "Play";
+    gameContainer.insertAdjacentElement("afterend", playButton);
+
+    playButton.addEventListener("click", () => {
+      displayBoard();
+      handlePlayButton();
+    });
+  };
+
+  const handlePlayButton = () => {
+    const gameTextContainer = document.createElement("div");
+    gameTextContainer.classList.add("text-container");
+
+    const gameText = document.createElement("p");
+    gameText.classList.add("text");
+    gameText.textContent = "Player X, make your move";
+    gameContainer.insertAdjacentElement("afterend", gameTextContainer);
+    gameTextContainer.appendChild(gameText);
+  };
+
   const handleCellClick = (e) => {
-    const marker = playerManager.getCurrentPlayer()
-    console.log("player marker:", marker)
-    const clickedCell = e.target
-    console.log("clicked cell:", clickedCell)
-    const row = clickedCell.dataset.row
-    console.log("clicked cell row index:", row)
-    const col = clickedCell.dataset.col
-    console.log("clicked cell col index:", col)
+    const marker = playerManager.getCurrentPlayer();
+    console.log("player marker:", marker);
 
-    clickedCell.textContent = marker
+    const clickedCell = e.target;
+    console.log("clicked cell:", clickedCell);
 
-    gameboard.setCell(row, col, marker)
-    console.log(gameboard.getBoard())
+    if (clickedCell.textContent !== "") {
+      return console.log("spot taken");
+    }
 
-    playerManager.switchPlayer()
+    const row = clickedCell.dataset.row;
+    const col = clickedCell.dataset.col;
+    clickedCell.textContent = marker;
+
+    control.playGame(row, col, marker);
   };
 
-  const markerButton = () => {
-    const markerContainer = document.createElement("div");
-    markerContainer.classList.add("marker-container");
-    gameContainer.insertAdjacentElement("afterend", markerContainer);
+  const restartGame = () => {
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("restart-container");
+    gameContainer.insertAdjacentElement("afterend", buttonContainer);
 
-    const markerXButton = document.createElement("button");
-    markerXButton.classList.add("button");
-    markerXButton.textContent = "X";
-    markerContainer.appendChild(markerXButton);
+    const button = document.createElement("button")
+    button.classList.add("restart-button");
+    button.textContent = "Restart";
+    buttonContainer.appendChild(button);
+    
+    button.addEventListener("click", () => {
 
-    const markerOButton = document.createElement("button");
-    markerOButton.classList.add("button");
-    markerOButton.textContent = "O";
-    markerContainer.appendChild(markerOButton);
+gameboard.resetBoard()
 
-    const buttons = document.querySelectorAll(".button");
-    buttons.forEach((button) =>
-      button.addEventListener("click", (e) => {
-        const buttonValue = e.target.textContent;
-        console.log("button click value:", buttonValue);
-        playerManager.setCurrentPlayer(buttonValue);
-        console.log("current player marker:", playerManager.getCurrentPlayer());
-      })
-    );
+displayBoard(gameboard.getBoard)
+
+
+    
+    })
   };
 
-  displayBoard();
-  markerButton();
+  restartGame();
+  playButton();
 
-  return { displayBoard, gameboard, playerManager, markerButton };
+  return { displayBoard, gameboard, playerManager, playButton, restartGame};
 };
 
 const control = GameController();

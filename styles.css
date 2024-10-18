@@ -10,8 +10,15 @@
 
   .game-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+
+    .cell-wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      place-items: center/center;
+    }
   
     .cell-container {
       border: solid 1px black;
