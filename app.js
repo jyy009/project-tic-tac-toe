@@ -114,17 +114,22 @@ const Player = (function () {
     return { marker };
   };
 
-  console.log("current player", currentPlayer);
+  const getCurrentPlayer = () => currentPlayer;
+
+  const setCurrentPlayer = (player) => {
+    currentPlayer = player;
+    console.log("current player set to:", currentPlayer);
+  };
 
   const switchPlayer = () => {
     currentPlayer = currentPlayer === "X" ? "O" : "X";
     console.log("next player", currentPlayer);
   };
 
-  return { createPlayer, switchPlayer };
+  return { createPlayer, switchPlayer, getCurrentPlayer, setCurrentPlayer };
 })();
 
-//Game flow factory funtion
+//Game flow factory function
 const GameController = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
@@ -158,36 +163,81 @@ const GameController = () => {
   return { playRound, playGame, gameboard, playerManager };
 };
 
-/*
- create an object that will handle the display/DOM logic. Write a function that will render the contents of the gameboard array to the webpage (for now, you can always just fill the gameboard array with "X"s and "O"s just to see what’s going on).
- */
-
 const DisplayLogic = () => {
   const gameboard = Gameboard;
+  const playerManager = Player;
 
   const gameContainer = document.querySelector(".game-container");
+  // const cellContainer = gameContainer.querySelectorAll(".cell-container")
 
   const displayBoard = () => {
     gameContainer.innerHTML = "";
     const board = gameboard.getBoard();
 
     board.forEach((row, rowIndex) => {
-      const rowContainer = document.createElement("div");
-      gameContainer.appendChild(rowContainer);
-      rowContainer.textContent = row;
+      row.forEach((cell, colIndex) => {
+        const cellContainer = document.createElement("div");
+        cellContainer.classList.add("cell-container");
+        cellContainer.textContent = cell;
+        cellContainer.dataset.row = rowIndex;
+        cellContainer.dataset.col = colIndex;
+        gameContainer.appendChild(cellContainer);
+
+        cellContainer.addEventListener("click", (e) => {
+          handleCellClick(e);
+        });
+      });
     });
   };
-  /*
-for (let i = 0; i < rows; i++) {
-      board[i] = [];
-      for (let j = 0; j < columns; j++) {
-        board[i][j] = "x";
-      }
-    }
-    */
-  displayBoard();
 
-  return { displayBoard, gameboard };
+  const handleCellClick = (e) => {
+    const marker = playerManager.getCurrentPlayer()
+    console.log("player marker:", marker)
+    const clickedCell = e.target
+    console.log("clicked cell:", clickedCell)
+    const row = clickedCell.dataset.row
+    console.log("clicked cell row index:", row)
+    const col = clickedCell.dataset.col
+    console.log("clicked cell col index:", col)
+
+    clickedCell.textContent = marker
+
+    gameboard.setCell(row, col, marker)
+    console.log(gameboard.getBoard())
+
+    playerManager.switchPlayer()
+  };
+
+  const markerButton = () => {
+    const markerContainer = document.createElement("div");
+    markerContainer.classList.add("marker-container");
+    gameContainer.insertAdjacentElement("afterend", markerContainer);
+
+    const markerXButton = document.createElement("button");
+    markerXButton.classList.add("button");
+    markerXButton.textContent = "X";
+    markerContainer.appendChild(markerXButton);
+
+    const markerOButton = document.createElement("button");
+    markerOButton.classList.add("button");
+    markerOButton.textContent = "O";
+    markerContainer.appendChild(markerOButton);
+
+    const buttons = document.querySelectorAll(".button");
+    buttons.forEach((button) =>
+      button.addEventListener("click", (e) => {
+        const buttonValue = e.target.textContent;
+        console.log("button click value:", buttonValue);
+        playerManager.setCurrentPlayer(buttonValue);
+        console.log("current player marker:", playerManager.getCurrentPlayer());
+      })
+    );
+  };
+
+  displayBoard();
+  markerButton();
+
+  return { displayBoard, gameboard, playerManager, markerButton };
 };
 
 const control = GameController();
