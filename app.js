@@ -14,8 +14,7 @@ const Gameboard = (function () {
   };
 
   const getBoard = () => {
-    // console.log([...board]);
-    return [...board]
+    return [...board];
   };
 
   const setCell = (row, col, value) => {
@@ -86,7 +85,7 @@ const Gameboard = (function () {
     return result;
   };
 
-  initializeBoard();
+  // initializeBoard();
 
   return {
     initializeBoard,
@@ -106,7 +105,7 @@ const Player = (function () {
     return { marker };
   };
 
-  const getCurrentPlayer = () =>  currentPlayer;
+  const getCurrentPlayer = () => currentPlayer;
 
   const setCurrentPlayer = (player) => {
     currentPlayer = player;
@@ -129,7 +128,6 @@ const GameController = () => {
   const playRound = (row, col, marker) => {
     if (gameboard.setCell(row, col, marker)) {
       playerManager.setCurrentPlayer(marker);
-      playerManager.getCurrentPlayer();
     } else {
       return "invalid move";
     }
@@ -163,6 +161,8 @@ const DisplayLogic = () => {
 
   const displayBoard = () => {
     gameContainer.innerHTML = "";
+    const initialize = gameboard.initializeBoard();
+    //  gameboard.setBoard(initialize)
     const board = gameboard.getBoard();
 
     const cellWrapper = document.createElement("div");
@@ -173,7 +173,7 @@ const DisplayLogic = () => {
       row.forEach((cell, colIndex) => {
         const cellContainer = document.createElement("div");
         cellContainer.classList.add("cell-container");
-        cellContainer.textContent = cell;
+        // cellContainer.textContent = cell;
         cellContainer.dataset.row = rowIndex;
         cellContainer.dataset.col = colIndex;
         cellWrapper.appendChild(cellContainer);
@@ -185,6 +185,42 @@ const DisplayLogic = () => {
     });
   };
 
+  // const handlePlayButton = () => {
+
+  //   const gameTextContainer = document.createElement("div");
+  //   gameTextContainer.classList.add("text-container");
+
+  //   const gameText = document.createElement("p");
+  //   gameText.classList.add("text");
+
+  //   const player = playerManager.createPlayer("X")
+  //   console.log(player)
+  //   const marker = player.marker
+  //   console.log(marker)
+  //   const currentP = playerManager.getCurrentPlayer()
+  //   console.log("current player after play button:", currentP)
+  //   if (marker === "X") {
+  //     gameText.textContent = "Player X, make your move";
+  //   } else {
+  //     gameText.textContent = "Player O, make your move"
+  //   }
+  //   gameContainer.insertAdjacentElement("afterend", gameTextContainer);
+  //   gameTextContainer.appendChild(gameText);
+  // };
+
+  const createGameInfoContainer = () => {
+    const gameInfoContainer = document.createElement("div");
+    gameInfoContainer.classList.add("text-container");
+
+    const gameText = document.createElement("p");
+    gameText.classList.add("text");
+    gameInfoContainer.appendChild(gameText);
+
+    gameContainer.insertAdjacentElement("afterend", gameInfoContainer);
+
+    return gameText;
+  };
+
   const playButton = () => {
     const playButton = document.createElement("button");
     playButton.classList.add("play-button");
@@ -193,25 +229,13 @@ const DisplayLogic = () => {
 
     playButton.addEventListener("click", () => {
       displayBoard();
-      handlePlayButton();
+      // createGameInfoContainer()
+      // handlePlayButton();
     });
   };
 
-  const handlePlayButton = () => {
-    const gameTextContainer = document.createElement("div");
-    gameTextContainer.classList.add("text-container");
-
-    const gameText = document.createElement("p");
-    gameText.classList.add("text");
-    gameText.textContent = "Player X, make your move";
-    gameContainer.insertAdjacentElement("afterend", gameTextContainer);
-    gameTextContainer.appendChild(gameText);
-  };
-
   const handleCellClick = (e) => {
-    const marker = playerManager.getCurrentPlayer();
-    console.log("player marker:", marker);
-
+    const gameTextElement = createGameInfoContainer();
     const clickedCell = e.target;
     console.log("clicked cell:", clickedCell);
 
@@ -221,8 +245,19 @@ const DisplayLogic = () => {
 
     const row = clickedCell.dataset.row;
     const col = clickedCell.dataset.col;
+    const marker = playerManager.getCurrentPlayer();
+    console.log("player marker:", marker);
+
     clickedCell.textContent = marker;
 
+    if (gameTextElement.textContent !== "") {
+      gameTextElement.remove();
+    }
+    if (marker === "X") {
+      gameTextElement.textContent = "Player O, make your move";
+    } else {
+      gameTextElement.textContent = "Player X, make your move";
+    }
     control.playGame(row, col, marker);
   };
 
@@ -231,26 +266,29 @@ const DisplayLogic = () => {
     buttonContainer.classList.add("restart-container");
     gameContainer.insertAdjacentElement("afterend", buttonContainer);
 
-    const button = document.createElement("button")
+    const button = document.createElement("button");
     button.classList.add("restart-button");
     button.textContent = "Restart";
     buttonContainer.appendChild(button);
-    
+
     button.addEventListener("click", () => {
+      gameboard.resetBoard();
 
-gameboard.resetBoard()
-
-displayBoard(gameboard.getBoard)
-
-
-    
-    })
+      displayBoard(gameboard.getBoard);
+    });
   };
 
   restartGame();
   playButton();
 
-  return { displayBoard, gameboard, playerManager, playButton, restartGame};
+  return {
+    displayBoard,
+    gameboard,
+    playerManager,
+    playButton,
+    restartGame,
+    createGameInfoContainer,
+  };
 };
 
 const control = GameController();
