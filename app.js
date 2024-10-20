@@ -124,6 +124,7 @@ const Player = (function () {
 const GameController = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
+  let winner = "";
 
   const playRound = (row, col, marker) => {
     if (gameboard.setCell(row, col, marker)) {
@@ -140,31 +141,32 @@ const GameController = () => {
       return roundResult;
     }
 
-    if (!gameboard.checkWinner(marker)) {
+    if (gameboard.checkWinner(marker)) {
+      winner = marker;
+      console.log(`winner is ${winner}`);
+      return winner;
+    } else if (!gameboard.checkWinner(marker)) {
       playerManager.switchPlayer();
-    } else {
-      return
-      // console.log(`${marker} is the winner`)
-      // gameboard.resetBoard();
     }
-
+  
     gameboard.checkTie(row, col);
   };
 
-  return { playRound, playGame, gameboard, playerManager };
+  const getWinner = () => winner;
+
+  return { playRound, playGame, gameboard, playerManager, getWinner };
 };
 
 const DisplayLogic = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
   let gameTextElement;
-let winner;
 
   const gameContainer = document.querySelector(".game-container");
 
   const displayBoard = () => {
     gameContainer.innerHTML = "";
-   gameboard.initializeBoard();
+    gameboard.initializeBoard();
     const board = gameboard.getBoard();
 
     const cellWrapper = document.createElement("div");
@@ -240,11 +242,11 @@ let winner;
     }
 
     control.playGame(row, col, marker);
-    
-    if (gameboard.checkWinner) {
-      gameTextElement.textContent = "X wins!"
-    } else {
-      gameTextElement.textContent = "O wins!"
+    const winner = control.getWinner();
+    console.log(winner)
+
+    if (winner) {
+      gameTextElement.textContent = `${winner} wins`;
     }
   };
 
