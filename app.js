@@ -153,8 +153,10 @@ const GameController = () => {
   };
 
   const getWinner = () => winner;
-
-  return { playRound, playGame, gameboard, playerManager, getWinner };
+  const resetWinner = (text) => {
+    winner = text
+  }
+  return { playRound, playGame, gameboard, playerManager, getWinner,resetWinner};
 };
 
 const DisplayLogic = () => {
@@ -167,6 +169,7 @@ const DisplayLogic = () => {
   const displayBoard = () => {
     gameContainer.innerHTML = "";
     gameboard.initializeBoard();
+
     const board = gameboard.getBoard();
 
     const cellWrapper = document.createElement("div");
@@ -189,22 +192,26 @@ const DisplayLogic = () => {
     });
   };
 
-  const createGameInfoContainer = () => {
+  const createGameInfoContainer = (text) => {
+    const existingContainer = document.querySelector(".text-container");
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+
     const gameInfoContainer = document.createElement("div");
     gameInfoContainer.classList.add("text-container");
 
     const gameText = document.createElement("p");
     gameText.classList.add("text");
-    gameText.textContent = "Player X, make your move";
+    // gameText.textContent = "Player X, make your move";
+    gameText.textContent = text;
+    // gameTextElement = gameText.textContent
     gameInfoContainer.appendChild(gameText);
 
     gameContainer.insertAdjacentElement("afterend", gameInfoContainer);
 
-    // if (gameText.textContent !== "") {
-    //   gameText.textContent = "";
-    // }
-
-    return { container: gameInfoContainer, text: gameText };
+    // return { gameInfoContainer, gameText };
+    return gameText;
   };
 
   const playButton = () => {
@@ -215,14 +222,19 @@ const DisplayLogic = () => {
 
     playButton.addEventListener("click", () => {
       displayBoard();
-      const gameInfo = createGameInfoContainer();
-      gameTextElement = gameInfo.text;
+      playerManager.setCurrentPlayer("X")
+      control.resetWinner("")
+      // const gameInfo = createGameInfoContainer();
+      // gameTextElement = gameInfo.gameText;
+      gameTextElement = createGameInfoContainer("Player X, make your move");
     });
   };
 
   const handleCellClick = (e) => {
     const clickedCell = e.target;
     console.log("clicked cell:", clickedCell);
+    // const gameInfo = createGameInfoContainer().gameText;
+    // gameTextElement = gameInfo;
 
     if (clickedCell.textContent !== "") {
       return console.log("spot taken");
@@ -233,20 +245,16 @@ const DisplayLogic = () => {
     const marker = playerManager.getCurrentPlayer();
     console.log("player marker:", marker);
 
+    control.playGame(row, col, marker);
     clickedCell.textContent = marker;
+    const gameWinner = control.getWinner();
 
-    if (marker === "X") {
+    if (gameWinner !== "") {
+      gameTextElement.textContent = `${gameWinner} wins`;
+    } else if (marker === "X") {
       gameTextElement.textContent = "Player O, make your move";
     } else {
       gameTextElement.textContent = "Player X, make your move";
-    }
-
-    control.playGame(row, col, marker);
-    const winner = control.getWinner();
-    console.log(winner);
-
-    if (winner) {
-      gameTextElement.textContent = `${winner} wins`;
     }
   };
 
@@ -261,13 +269,15 @@ const DisplayLogic = () => {
     buttonContainer.appendChild(button);
 
     button.addEventListener("click", () => {
-      gameboard.resetBoard();
-
-      displayBoard(gameboard.getBoard);
-
+      displayBoard();
       playerManager.setCurrentPlayer("X");
-      gameTextElement.textContent = "Player X, make your move"
+      control.resetWinner("")
 
+      if (gameTextElement) {
+        gameTextElement.textContent = "Player X, make your move";
+      } else {
+        gameTextElement = createGameInfoContainer("Player X, make your move");
+      }
     });
   };
 
