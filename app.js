@@ -148,7 +148,7 @@ const GameController = () => {
     } else if (!gameboard.checkWinner(marker)) {
       playerManager.switchPlayer();
     }
-  
+
     gameboard.checkTie(row, col);
   };
 
@@ -200,9 +200,9 @@ const DisplayLogic = () => {
 
     gameContainer.insertAdjacentElement("afterend", gameInfoContainer);
 
-    if (gameText.textContent !== "") {
-      gameText.textContent = "";
-    }
+    // if (gameText.textContent !== "") {
+    //   gameText.textContent = "";
+    // }
 
     return { container: gameInfoContainer, text: gameText };
   };
@@ -243,7 +243,7 @@ const DisplayLogic = () => {
 
     control.playGame(row, col, marker);
     const winner = control.getWinner();
-    console.log(winner)
+    console.log(winner);
 
     if (winner) {
       gameTextElement.textContent = `${winner} wins`;
@@ -264,6 +264,10 @@ const DisplayLogic = () => {
       gameboard.resetBoard();
 
       displayBoard(gameboard.getBoard);
+
+      playerManager.setCurrentPlayer("X");
+      gameTextElement.textContent = "Player X, make your move"
+
     });
   };
 
