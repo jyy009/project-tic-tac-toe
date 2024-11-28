@@ -26,8 +26,6 @@ const Gameboard = (function () {
     }
   };
 
-  const resetBoard = () => initializeBoard();
-
   const checkWinner = (mark) => {
     const winningCombo = [
       [
@@ -91,7 +89,6 @@ const Gameboard = (function () {
     initializeBoard,
     getBoard,
     setCell,
-    resetBoard,
     checkWinner,
     checkTie,
   };
@@ -154,11 +151,19 @@ const GameController = () => {
 
   const getWinner = () => winner;
   const resetWinner = (text) => {
-    winner = text
-  }
-  return { playRound, playGame, gameboard, playerManager, getWinner,resetWinner};
+    winner = text;
+  };
+  return {
+    playRound,
+    playGame,
+    gameboard,
+    playerManager,
+    getWinner,
+    resetWinner,
+  };
 };
 
+//fx to display the game UI
 const DisplayLogic = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
@@ -180,7 +185,7 @@ const DisplayLogic = () => {
       row.forEach((cell, colIndex) => {
         const cellContainer = document.createElement("div");
         cellContainer.classList.add("cell-container");
-        // cellContainer.textContent = cell;
+
         cellContainer.dataset.row = rowIndex;
         cellContainer.dataset.col = colIndex;
         cellWrapper.appendChild(cellContainer);
@@ -200,17 +205,14 @@ const DisplayLogic = () => {
 
     const gameInfoContainer = document.createElement("div");
     gameInfoContainer.classList.add("text-container");
+    gameContainer.insertAdjacentElement("afterend", gameInfoContainer);
 
     const gameText = document.createElement("p");
     gameText.classList.add("text");
-    // gameText.textContent = "Player X, make your move";
-    gameText.textContent = text;
-    // gameTextElement = gameText.textContent
     gameInfoContainer.appendChild(gameText);
 
-    gameContainer.insertAdjacentElement("afterend", gameInfoContainer);
+    gameText.textContent = text;
 
-    // return { gameInfoContainer, gameText };
     return gameText;
   };
 
@@ -222,10 +224,9 @@ const DisplayLogic = () => {
 
     playButton.addEventListener("click", () => {
       displayBoard();
-      playerManager.setCurrentPlayer("X")
-      control.resetWinner("")
-      // const gameInfo = createGameInfoContainer();
-      // gameTextElement = gameInfo.gameText;
+      playerManager.setCurrentPlayer("X");
+      control.resetWinner("");
+
       gameTextElement = createGameInfoContainer("Player X, make your move");
     });
   };
@@ -233,8 +234,6 @@ const DisplayLogic = () => {
   const handleCellClick = (e) => {
     const clickedCell = e.target;
     console.log("clicked cell:", clickedCell);
-    // const gameInfo = createGameInfoContainer().gameText;
-    // gameTextElement = gameInfo;
 
     if (clickedCell.textContent !== "") {
       return console.log("spot taken");
@@ -271,7 +270,7 @@ const DisplayLogic = () => {
     button.addEventListener("click", () => {
       displayBoard();
       playerManager.setCurrentPlayer("X");
-      control.resetWinner("")
+      control.resetWinner("");
 
       if (gameTextElement) {
         gameTextElement.textContent = "Player X, make your move";
@@ -296,3 +295,4 @@ const DisplayLogic = () => {
 
 const control = GameController();
 const displayLogic = DisplayLogic();
+displayLogic.displayBoard();
