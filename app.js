@@ -197,11 +197,13 @@ const DisplayLogic = () => {
     });
   };
 
+displayBoard()
+
   const createGameInfoContainer = (text) => {
     const existingContainer = document.querySelector(".text-container");
     if (existingContainer) {
       existingContainer.remove();
-    }
+    } 
 
     const gameInfoContainer = document.createElement("div");
     gameInfoContainer.classList.add("text-container");
@@ -216,20 +218,7 @@ const DisplayLogic = () => {
     return gameText;
   };
 
-  const playButton = () => {
-    const playButton = document.createElement("button");
-    playButton.classList.add("play-button");
-    playButton.textContent = "Play";
-    gameContainer.insertAdjacentElement("afterend", playButton);
 
-    playButton.addEventListener("click", () => {
-      displayBoard();
-      playerManager.setCurrentPlayer("X");
-      control.resetWinner("");
-
-      gameTextElement = createGameInfoContainer("Player X, make your move");
-    });
-  };
 
   const handleCellClick = (e) => {
     const clickedCell = e.target;
@@ -257,18 +246,19 @@ const DisplayLogic = () => {
     }
   };
 
-  const restartGame = () => {
+  const playGame = () => {
     const buttonContainer = document.createElement("div");
     buttonContainer.classList.add("restart-container");
     gameContainer.insertAdjacentElement("afterend", buttonContainer);
 
     const button = document.createElement("button");
     button.classList.add("restart-button");
-    button.textContent = "Restart";
+    button.textContent = "Play";
     buttonContainer.appendChild(button);
 
     button.addEventListener("click", () => {
       displayBoard();
+      button.textContent = "Restart";
       playerManager.setCurrentPlayer("X");
       control.resetWinner("");
 
@@ -280,15 +270,15 @@ const DisplayLogic = () => {
     });
   };
 
-  restartGame();
-  playButton();
+  playGame();
+ 
 
   return {
     displayBoard,
     gameboard,
     playerManager,
     playButton,
-    restartGame,
+    playGame,
     createGameInfoContainer,
   };
 };

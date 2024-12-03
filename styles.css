@@ -1,27 +1,58 @@
- * {
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
   box-sizing: border-box;
   border: 0;
   margin: 0;
 }
 
+:root {
+  --color-gray: #d1d1d1;
+  --color-teal: #51a3a3;
+  --color-yellow: #ead94c;
+  --font-main: "Montserrat", serif;
+}
+
 .page-container {
   width: 100vw;
   min-height: 100vh;
-
-  .game-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-
-    .cell-wrapper {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
-      place-items: center/center;
-    }
-  
-    .cell-container {
-      border: solid 1px black;
-    }
+  background-color: var(--color-gray);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
+
+#header {
+  font-family: var(--font-main);
+  font-size: 3rem;
+  text-align: center;
+  
+}
+
+.game-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.cell-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  justify-content: center;
+  
+}
+
+.cell-container {
+  border: solid 1px black;
+}
+
+.text-container {
+  display: flex;
+justify-content: center;
+}
+
+.restart-container {
+  display: flex;
+justify-content: center;
 }
