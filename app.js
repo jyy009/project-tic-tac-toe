@@ -122,6 +122,7 @@ const GameController = () => {
   const gameboard = Gameboard;
   const playerManager = Player;
   let winner = "";
+  let gameStarted = false;
 
   const playRound = (row, col, marker) => {
     if (gameboard.setCell(row, col, marker)) {
@@ -160,6 +161,7 @@ const GameController = () => {
     playerManager,
     getWinner,
     resetWinner,
+    gameStarted,
   };
 };
 
@@ -188,6 +190,19 @@ const DisplayLogic = () => {
 
         cellContainer.dataset.row = rowIndex;
         cellContainer.dataset.col = colIndex;
+
+        if (rowIndex === 0) {
+          cellContainer.classList.add("top-row");
+        } else if (rowIndex === 1) {
+          cellContainer.classList.add("middle-row");
+        } else {
+          cellContainer.classList.add("bottom-row");
+        }
+
+        if (colIndex === 2) {
+          cellContainer.classList.add("right-col");
+        }
+
         cellWrapper.appendChild(cellContainer);
 
         cellContainer.addEventListener("click", (e) => {
@@ -197,13 +212,13 @@ const DisplayLogic = () => {
     });
   };
 
-displayBoard()
+  displayBoard();
 
   const createGameInfoContainer = (text) => {
     const existingContainer = document.querySelector(".text-container");
     if (existingContainer) {
       existingContainer.remove();
-    } 
+    }
 
     const gameInfoContainer = document.createElement("div");
     gameInfoContainer.classList.add("text-container");
@@ -218,14 +233,26 @@ displayBoard()
     return gameText;
   };
 
-
-
   const handleCellClick = (e) => {
+    if (!control.gameStarted) {
+      return;
+    }
     const clickedCell = e.target;
     console.log("clicked cell:", clickedCell);
 
+    const existingTextP = document.querySelector(".spot-taken");
+    if (existingTextP) {
+      existingTextP.remove();
+    }
+
     if (clickedCell.textContent !== "") {
-      return console.log("spot taken");
+      const textP = document.createElement("p");
+      textP.classList.add("spot-taken");
+      textP.textContent = "Spot taken!";
+      const gameInfoContainer = document.querySelector(".text-container");
+      gameInfoContainer.appendChild(textP);
+
+      return;
     }
 
     const row = clickedCell.dataset.row;
@@ -238,11 +265,11 @@ displayBoard()
     const gameWinner = control.getWinner();
 
     if (gameWinner !== "") {
-      gameTextElement.textContent = `${gameWinner} wins`;
+      gameTextElement.textContent = `${gameWinner} wins!`;
     } else if (marker === "X") {
-      gameTextElement.textContent = "Player O, make your move";
+      gameTextElement.textContent = "Player O, make your move.";
     } else {
-      gameTextElement.textContent = "Player X, make your move";
+      gameTextElement.textContent = "Player X, make your move.";
     }
   };
 
@@ -253,25 +280,25 @@ displayBoard()
 
     const button = document.createElement("button");
     button.classList.add("restart-button");
-    button.textContent = "Play";
+    button.textContent = "Start";
     buttonContainer.appendChild(button);
 
     button.addEventListener("click", () => {
+      control.gameStarted = true;
       displayBoard();
       button.textContent = "Restart";
       playerManager.setCurrentPlayer("X");
       control.resetWinner("");
 
       if (gameTextElement) {
-        gameTextElement.textContent = "Player X, make your move";
+        gameTextElement.textContent = "Player X, make your move.";
       } else {
-        gameTextElement = createGameInfoContainer("Player X, make your move");
+        gameTextElement = createGameInfoContainer("Player X, make your move.");
       }
     });
   };
 
   playGame();
- 
 
   return {
     displayBoard,
